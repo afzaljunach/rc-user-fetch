@@ -4,24 +4,28 @@ function Mystore() {
 
   const [userData, setUserData] = useState([]);
   const [loadMoreData, setLoadMoreData] = useState([]);
-  const [itemPerPage, setItemPerPage] = useState(10); //Set Items Page 
+  const itemPerPage = 10; //Set Items Page 
+  const [loading, setLoading] = useState(true);
   
   const fetchURL = `https://retoolapi.dev/J56W2U/users`
 
-  useEffect(() => {
-    //Fetch Data
-    async function getUsers(){
-      const response = await fetch(fetchURL);
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status}`;
-        throw new Error(message);
-      }
-      const usersData = await response.json();
-      return usersData;
-    }
 
+  //Fetch Data
+  async function getUsers(){
+    const response = await fetch(fetchURL);
+    if (!response.ok) {
+      const message = `An error has occured: ${response.status}`;
+      throw new Error(message);
+    }
+    const usersData = await response.json();
+    return usersData;
+  }
+
+
+  useEffect(() => {
+    
     //Set Initial Data
-    getUsers().then(data => {
+    !loading && getUsers().then(data => {
       //Set Intial Data Limit
       let d = data;
 
@@ -32,9 +36,17 @@ function Mystore() {
       setLoadMoreData(data);
 
     }).catch(error => {
-      alert(error);
+      console.log(error);
     });
-  }, [])
+
+    setLoading(false);
+
+    //Unmount
+    return () => {
+      setLoading(true);
+    };    
+  }, [loading])
+  
   
 
 
